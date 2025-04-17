@@ -106,7 +106,7 @@ const TokenList: React.FC = () => {
   
   const [tokens, setTokens] = useState<TokenInfo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>('');
   const [totalCount, setTotalCount] = useState(0);
   
   // Пагинация
@@ -119,7 +119,22 @@ const TokenList: React.FC = () => {
   const [sortFilter, setSortFilter] = useState('newest');
   
   useEffect(() => {
-    fetchTokens();
+    const getTokens = async () => {
+      try {
+        setLoading(true);
+        const fetchedTokens = await fetchTokens();
+        setTokens(fetchedTokens);
+        setFilteredTokens(fetchedTokens);
+        setError(null);
+      } catch (error) {
+        console.error('Failed to fetch tokens:', error);
+        setError('Failed to load tokens. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    getTokens();
   }, [account]);
   
   useEffect(() => {
@@ -150,26 +165,13 @@ const TokenList: React.FC = () => {
     setPage(1);
   }, [searchQuery, filteredTokens, sortFilter]);
 
-  const fetchTokens = async () => {
-    setLoading(true);
+  const fetchTokens = async (): Promise<TokenInfo[]> => {
+    // В реальном приложении это был бы запрос к API или смарт-контракту
     try {
-      const count = await getTokensCount();
-      setTotalCount(count);
-      
-      if (count > 0) {
-        const tokenInfo = await getTokensInfo(0, count);
-        // Сортировка по времени создания (от новых к старым)
-        const sortedTokens = [...tokenInfo].sort((a, b) => 
-          Number(b.timestamp) - Number(a.timestamp)
-        );
-        setTokens(sortedTokens);
-        setFilteredTokens(sortedTokens);
-      }
-    } catch (err) {
-      console.error('Ошибка при загрузке токенов:', err);
-      setError('Не удалось загрузить список токенов');
-    } finally {
-      setLoading(false);
+      return await getTokensInfo();
+    } catch (error) {
+      console.error("Error fetching tokens:", error);
+      return [];
     }
   };
   

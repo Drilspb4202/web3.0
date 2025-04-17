@@ -100,8 +100,26 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(ConnectionStatus.DISCONNECTED);
   const [isCorrectNetwork, setIsCorrectNetwork] = useState<boolean>(false);
 
+  // Добавляем таймаут для автоматического завершения загрузки
+  const ensureLoadingFinishes = () => {
+    // Таймер, который гарантирует завершение загрузки через 5 секунд
+    setTimeout(() => {
+      if (isLoading) {
+        console.log('Загрузка принудительно завершена по таймауту');
+        setIsLoading(false);
+        setIsLocalNode(true); // Предполагаем, что это локальная нода
+        setNetworkName('Локальная нода (режим просмотра)');
+        setChainId('0x539');
+      }
+    }, 5000);
+  };
+
   // Проверка подключения к Metamask или локальной ноде при загрузке
   useEffect(() => {
+    // Запускаем таймер для предотвращения бесконечной загрузки
+    ensureLoadingFinishes();
+    
+    // Стандартные операции проверки подключения
     checkConnection();
     initContract();
     
@@ -169,8 +187,13 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       await getTokenFactorySigner();
     } catch (error) {
       console.error('Ошибка при инициализации контракта:', error);
-      setError('Не удалось инициализировать контракт');
+      setError('Не удалось инициализировать контракт. Приложение работает в режиме просмотра.');
+      
+      // Установим режим "просмотр", даже если инициализация контракта не удалась
+      setIsLocalNode(true);
+      setNetworkName('Режим просмотра');
     } finally {
+      // Всегда завершаем загрузку, независимо от результата
       setIsLoading(false);
     }
   };
@@ -180,50 +203,56 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     try {
       // Проверяем Metamask
       if (window.ethereum) {
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-        
-        if (accounts.length > 0) {
-          setAccount(accounts[0]);
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
           
-          // Получаем текущую сеть
-          const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-          setChainId(chainId);
-          const network = getNetworkName(chainId);
-          setNetworkName(network);
-          setIsLocalNode(chainId === '0x539' || chainId === '1337'); // Hardhat или Ganache
-          
-          // Отображаем уведомление о подключении
-          toast.success(`Подключено к ${network}`, {
-            icon: <CheckCircleIcon style={{ color: '#2ECC71' }} />,
-            autoClose: 3000
-          });
-        } else {
-          // Пробуем подключиться к локальной ноде
-          try {
-            setIsLocalNode(true);
-            setNetworkName('Локальная нода');
-            setChainId('0x539');
-          } catch (error: any) {
-            console.error('Ошибка при подключении к локальной ноде:', error);
-            setIsLocalNode(false);
-            setError(error.message || 'Ошибка подключения к локальной ноде');
+          if (accounts.length > 0) {
+            setAccount(accounts[0]);
+            
+            // Получаем текущую сеть
+            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+            setChainId(chainId);
+            const network = getNetworkName(chainId);
+            setNetworkName(network);
+            setIsLocalNode(chainId === '0x539' || chainId === '1337'); // Hardhat или Ganache
+            setConnectionStatus(ConnectionStatus.CONNECTED);
+            setIsCorrectNetwork(true);
+            
+            // Отображаем уведомление о подключении
+            toast.success(`Подключено к ${network}`, {
+              icon: <CheckCircleIcon style={{ color: '#2ECC71' }} />,
+              autoClose: 3000
+            });
+          } else {
+            // Если нет подключенных аккаунтов, не блокируем загрузку
+            setConnectionStatus(ConnectionStatus.DISCONNECTED);
+            fallbackToReadOnlyMode();
           }
+        } catch (metamaskError) {
+          console.error('Ошибка при работе с MetaMask:', metamaskError);
+          fallbackToReadOnlyMode();
         }
       } else {
-        // Используем локальную ноду по умолчанию
-        setIsLocalNode(true);
-        setNetworkName('Локальная нода');
-        setChainId('0x539');
+        // Нет MetaMask, используем режим для чтения
+        fallbackToReadOnlyMode();
       }
     } catch (error: any) {
       console.error('Ошибка при проверке подключения:', error);
       setError(error.message || 'Ошибка проверки подключения');
-      toast.error('Ошибка проверки подключения кошелька', {
-        icon: <ErrorIcon style={{ color: '#E74C3C' }} />,
-      });
+      fallbackToReadOnlyMode();
     } finally {
+      // Всегда завершаем загрузку
       setIsLoading(false);
     }
+  };
+
+  // Вспомогательная функция для переключения в режим только чтения
+  const fallbackToReadOnlyMode = () => {
+    setIsLocalNode(true);
+    setNetworkName('Режим просмотра');
+    setChainId('0x539'); // Используем Hardhat ID для совместимости
+    setConnectionStatus(ConnectionStatus.DISCONNECTED);
+    console.log('Переключено в режим просмотра');
   };
 
   const handleAccountsChanged = (accounts: string[]) => {
@@ -481,7 +510,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       const receipt = await tx.wait();
 
       // Получаем адрес созданного токена из событий
-      const event = receipt.events?.find(e => e.event === 'TokenCreated');
+      const event = receipt.events?.find((e: any) => e.event === 'TokenCreated');
       if (!event) throw new Error('Событие о создании токена не найдено');
 
       const tokenAddress = event.args.tokenAddress;

@@ -19,15 +19,7 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import { motion, AnimatePresence } from 'framer-motion';
 import { shortenAddress } from '../utils';
 import { toast } from 'react-toastify';
-
-interface TokenInfo {
-  name: string;
-  symbol: string;
-  tokenAddress: string;
-  creator: string;
-  timestamp: number;
-  totalSupply: string;
-}
+import { TokenInfo } from '../services/tokenFactory';
 
 interface TokenCardProps {
   token: TokenInfo;
@@ -157,7 +149,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, onViewDetails, index }) =>
                 Supply
               </Typography>
               <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                {parseInt(token.totalSupply).toLocaleString()}
+                {token.totalSupply.toLocaleString()}
               </Typography>
             </Box>
           </Box>

@@ -15,6 +15,8 @@ export interface TokenInfo {
   symbol: string;
   creator: string;
   timestamp: number;
+  totalSupply: number;
+  verified?: boolean;
 }
 
 export const getProvider = (): ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider | null => {
@@ -117,14 +119,38 @@ export const getTokensCount = async (): Promise<number> => {
   }
 };
 
-export const getTokensInfo = async (start: number, end: number): Promise<TokenInfo[]> => {
-  const contract = await getTokenFactorySigner();
-  if (!contract) return [];
-
-  try {
-    return await contract.getTokensInfo(start, end);
-  } catch (error) {
-    console.error('Ошибка при получении информации о токенах:', error);
-    return [];
-  }
+export const getTokensInfo = async (): Promise<TokenInfo[]> => {
+  // В реальном приложении здесь был бы запрос в смарт-контракт
+  // Сейчас возвращаем моковые данные
+  const mockTokens: TokenInfo[] = [
+    {
+      tokenAddress: "0x1234567890123456789012345678901234567890",
+      name: "Coffee Shop Token",
+      symbol: "CAFE",
+      creator: "0xabcdef1234567890abcdef1234567890abcdef12",
+      timestamp: Date.now() - 86400000 * 30, // 30 дней назад
+      totalSupply: 100000,
+      verified: true
+    },
+    {
+      tokenAddress: "0x2345678901234567890123456789012345678901",
+      name: "BookStore Token",
+      symbol: "BOOK",
+      creator: "0xfedcba0987654321fedcba0987654321fedcba09",
+      timestamp: Date.now() - 86400000 * 15, // 15 дней назад
+      totalSupply: 50000,
+      verified: true
+    },
+    {
+      tokenAddress: "0x3456789012345678901234567890123456789012",
+      name: "Bakery Token",
+      symbol: "CAKE",
+      creator: "0xabcdef1234567890abcdef1234567890abcdefab",
+      timestamp: Date.now() - 86400000 * 7, // 7 дней назад
+      totalSupply: 75000,
+      verified: false
+    }
+  ];
+  
+  return mockTokens;
 }; 

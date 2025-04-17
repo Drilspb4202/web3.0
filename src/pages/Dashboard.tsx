@@ -111,9 +111,29 @@ const timeAgo = (timestamp: number) => {
   return 'just now';
 };
 
+// Добавляем типы для активности
+type ActivityType = 'buy' | 'sell' | 'tokenize' | 'dividend' | (string & {});
+
+interface Activity {
+  type: ActivityType;
+  user?: string;
+  amount?: number;
+  token?: string;
+  tokenName?: string;
+  time?: number;
+}
+
 // Activity item component
 interface ActivityItemProps {
-  activity: typeof dashboardStats.recentActivity[0];
+  activity: {
+    id: number;
+    type: string;
+    user?: string;
+    amount?: number;
+    token?: string;
+    tokenName?: string;
+    time: number;
+  };
   delay: number;
 }
 
@@ -150,18 +170,24 @@ const ActivityItem: React.FC<ActivityItemProps> = ({ activity, delay }) => {
     }
   };
   
-  const getActivityText = (activity: typeof dashboardStats.recentActivity[0]) => {
+  const getActivityMessage = (activity: { 
+    type: string;
+    user?: string;
+    amount?: number;
+    token?: string;
+    tokenName?: string;
+  }) => {
     switch (activity.type) {
       case 'buy':
-        return `${shortenAddress(activity.user)} purchased ${formatAmount(activity.amount)} ${activity.token}`;
+        return `${shortenAddress(activity.user ?? '')} purchased ${formatAmount(activity.amount ?? 0)} ${activity.token ?? ''}`;
       case 'sell':
-        return `${shortenAddress(activity.user)} sold ${formatAmount(activity.amount)} ${activity.token}`;
+        return `${shortenAddress(activity.user ?? '')} sold ${formatAmount(activity.amount ?? 0)} ${activity.token ?? ''}`;
       case 'tokenize':
-        return `${shortenAddress(activity.user)} tokenized ${activity.tokenName} as ${activity.token}`;
+        return `${shortenAddress(activity.user ?? '')} tokenized ${activity.tokenName ?? ''} as ${activity.token ?? ''}`;
       case 'dividend':
-        return `${activity.tokenName} distributed ${formatAmount(activity.amount)} in dividends`;
+        return `${activity.tokenName ?? ''} distributed ${formatAmount(activity.amount ?? 0)} in dividends`;
       default:
-        return `Unknown activity with ${activity.token}`;
+        return `Unknown activity with ${activity.token ?? 'unknown token'}`;
     }
   };
   
@@ -198,7 +224,7 @@ const ActivityItem: React.FC<ActivityItemProps> = ({ activity, delay }) => {
         
         <Box sx={{ flex: 1 }}>
           <Typography variant="body1" sx={{ fontWeight: 500 }}>
-            {getActivityText(activity)}
+            {getActivityMessage(activity)}
           </Typography>
           <Typography variant="caption" color="text.secondary">
             {activity.tokenName} • {activity.token}
@@ -206,7 +232,7 @@ const ActivityItem: React.FC<ActivityItemProps> = ({ activity, delay }) => {
         </Box>
         
         <Chip 
-          label={timeAgo(activity.time)}
+          label={timeAgo(activity.time ?? 0)}
           size="small"
           sx={{ 
             bgcolor: alpha(getActivityColor(activity.type), 0.1),

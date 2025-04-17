@@ -10,14 +10,13 @@ import {
   useTheme,
   IconButton,
   Tooltip,
-  Button,
   alpha
 } from '@mui/material';
 import SortIcon from '@mui/icons-material/Sort';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import { Link } from 'react-router-dom';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { motion } from 'framer-motion';
+import { CreateButton } from './CreateButton';
 
 const StyledFormControl = styled(FormControl)(({ theme }) => ({
   minWidth: 200,
@@ -34,22 +33,6 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
       borderColor: theme.palette.primary.main,
     },
   },
-}));
-
-const CreateButton = styled(Button)(({ theme }) => ({
-  background: 'var(--button-gradient)',
-  color: '#fff',
-  fontWeight: 600,
-  textTransform: 'none',
-  borderRadius: '12px',
-  padding: '8px 16px',
-  boxShadow: 'var(--shadow-sm)',
-  '&:hover': {
-    boxShadow: 'var(--shadow-md)',
-    transform: 'translateY(-2px)',
-    background: 'var(--button-gradient-hover)',
-  },
-  transition: 'all 0.3s ease',
 }));
 
 interface FiltersBarProps {
@@ -117,7 +100,6 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
       )}
       
       <CreateButton
-        component={Link as any}
         to="/create-token"
         startIcon={<AddCircleOutlineIcon />}
         sx={{
