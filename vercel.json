@@ -1,31 +1,11 @@
 {
   "version": 2,
-  "buildCommand": "cp vercel.package.json package.json && npm install && npm run build",
+  "buildCommand": "cp vercel.package.json package.json && npm install --legacy-peer-deps && npm run build",
   "outputDirectory": "build",
   "framework": "create-react-app",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
   "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
-    },
-    {
-      "src": "/manifest.json",
-      "dest": "/manifest.json"
-    },
-    {
-      "src": "/asset-manifest.json",
-      "dest": "/asset-manifest.json"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "github": {
-    "silent": true
-  }
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 } 
