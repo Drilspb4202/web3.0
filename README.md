@@ -130,36 +130,6 @@ npm run node
 npm run deploy:local
 ```
 
-## Деплой на Vercel
-
-Для деплоя проекта на Vercel, выполните следующие шаги:
-
-1. Установите Vercel CLI:
-```bash
-npm install -g vercel
-```
-
-2. Авторизуйтесь:
-```bash
-vercel login
-```
-
-3. Деплой для разработки:
-```bash
-npm run vercel-deploy
-```
-
-4. Деплой в продакшн:
-```bash
-npm run vercel-deploy:prod
-```
-
-Или используйте автоматический деплой через GitHub:
-1. Подключите репозиторий к Vercel через панель управления Vercel
-2. Настройте Environment Variables в панели Vercel:
-   - Добавьте переменные из .env файла (кроме PRIVATE_KEY)
-   - Для frontend части добавьте REACT_APP_* переменные
-
 ## Лицензия
 
 MIT
