@@ -27,7 +27,8 @@
     "deploy": "npx hardhat run scripts/deploy.ts --network fuji",
     "deploy:local": "npx hardhat run scripts/deploy.ts --network localhost",
     "node": "npx hardhat node",
-    "test:contract": "npx hardhat test"
+    "test:contract": "npx hardhat test",
+    "vercel-build": "./vercel-build.sh"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.3",
