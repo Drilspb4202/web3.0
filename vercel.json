@@ -1,11 +1,5 @@
 {
-  "version": 2,
-  "buildCommand": "cp vercel.package.json package.json && npm install --legacy-peer-deps && npm run build",
-  "outputDirectory": "build",
-  "framework": "create-react-app",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 } 
