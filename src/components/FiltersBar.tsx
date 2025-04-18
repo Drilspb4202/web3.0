@@ -33,10 +33,15 @@ const categories = [
   { label: 'Туризм', value: 'tourism' }
 ];
 
-const FiltersBar: React.FC = () => {
+interface FiltersBarProps {
+  onSortChange?: (value: string) => void;
+  sortValue?: string;
+}
+
+const FiltersBar: React.FC<FiltersBarProps> = ({ onSortChange, sortValue }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchText, setSearchText] = useState('');
-  const [sortType, setSortType] = useState('newest');
+  const [sortType, setSortType] = useState(sortValue || 'newest');
   const [sortAnchorEl, setSortAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleCategoryChange = (category: string) => {
@@ -55,15 +60,22 @@ const FiltersBar: React.FC = () => {
     setSortAnchorEl(null);
   };
 
-  const handleSortSelect = (sortType: string) => {
-    setSortType(sortType);
+  const handleSortSelect = (newSortType: string) => {
+    setSortType(newSortType);
+    if (onSortChange) {
+      onSortChange(newSortType);
+    }
     handleSortMenuClose();
   };
 
   const resetFilters = () => {
     setSelectedCategory('all');
     setSearchText('');
-    setSortType('newest');
+    const defaultSort = 'newest';
+    setSortType(defaultSort);
+    if (onSortChange) {
+      onSortChange(defaultSort);
+    }
   };
 
   return (
@@ -115,7 +127,7 @@ const FiltersBar: React.FC = () => {
               <Select
                 labelId="sort-select-label"
                 id="sort-select"
-                value={sortType}
+                value={sortValue || sortType}
                 label="Сортировка"
                 sx={{ 
                   borderRadius: 'var(--radius-md)',
@@ -124,6 +136,8 @@ const FiltersBar: React.FC = () => {
                 onChange={(e: SelectChangeEvent) => handleSortSelect(e.target.value)}
               >
                 <MenuItem value="newest">Сначала новые</MenuItem>
+                <MenuItem value="oldest">Сначала старые</MenuItem>
+                <MenuItem value="name">По названию</MenuItem>
                 <MenuItem value="progress">По прогрессу сбора</MenuItem>
                 <MenuItem value="price-asc">По цене (возр.)</MenuItem>
                 <MenuItem value="price-desc">По цене (убыв.)</MenuItem>

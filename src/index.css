@@ -1,28 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
 
 :root {
   /* Основная палитра - светлый режим */
-  --primary-color: #8E44AD;
-  --primary-light: #A569BD;
-  --primary-dark: #703688;
-  --secondary-color: #EB8F10;
-  --secondary-light: #FFA726;
-  --dark-color: #2C3E50;
+  --primary-color: #6C5CE7;
+  --primary-light: #A29BFE;
+  --primary-dark: #5D50E6;
+  --secondary-color: #00D2D3;
+  --secondary-light: #81ECEC;
+  --dark-color: #1E272E;
   --light-color: #F8F9FA;
-  --success-color: #2ECC71;
-  --info-color: #3498DB;
-  --warning-color: #F39C12;
-  --danger-color: #E74C3C;
+  --success-color: #00B894;
+  --info-color: #0984E3;
+  --warning-color: #FDCB6E;
+  --danger-color: #E17055;
   --bg-color: #F8F9FA;
   --card-bg: white;
   --text-color: #333;
   --text-secondary: #666;
   --border-color: rgba(0, 0, 0, 0.1);
+  --input-bg: rgba(0, 0, 0, 0.03);
   
   /* Градиенты */
-  --gradient-primary: linear-gradient(135deg, #8E44AD 0%, #9B59B6 100%);
-  --gradient-secondary: linear-gradient(135deg, #EB8F10 0%, #F39C12 100%);
-  --gradient-hero: linear-gradient(120deg, #8E44AD 0%, #EB8F10 100%);
+  --gradient-primary: linear-gradient(135deg, #6C5CE7 0%, #A29BFE 100%);
+  --gradient-secondary: linear-gradient(135deg, #00D2D3 0%, #81ECEC 100%);
+  --gradient-hero: linear-gradient(120deg, #6C5CE7 0%, #00D2D3 100%);
+  --text-gradient: linear-gradient(90deg, #6C5CE7, #00D2D3);
   
   /* Тени */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -38,22 +40,29 @@
   /* Анимации */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
+  
+  /* Эффекты */
+  --blur-sm: blur(8px);
+  --blur-md: blur(16px);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.2);
 }
 
 /* Темный режим */
 [data-theme="dark"] {
-  --primary-color: #9B59B6;
-  --primary-light: #BB8FCE;
-  --primary-dark: #7D3C98;
-  --secondary-color: #F39C12;
-  --secondary-light: #FFC107;
-  --dark-color: #ECF0F1;
-  --light-color: #2C3E50;
-  --bg-color: #1E272E;
-  --card-bg: #2C3E50;
-  --text-color: #ECF0F1;
-  --text-secondary: #BDC3C7;
+  --primary-color: #A29BFE;
+  --primary-light: #D6D3FE;
+  --primary-dark: #6C5CE7;
+  --secondary-color: #81ECEC;
+  --secondary-light: #00D2D3;
+  --dark-color: #F8F9FA;
+  --light-color: #1E272E;
+  --bg-color: #0F1A20;
+  --card-bg: #1E272E;
+  --text-color: #DCDDE1;
+  --text-secondary: #A4B0BE;
   --border-color: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.05);
   
   /* Тени для темного режима */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -61,9 +70,13 @@
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
   
   /* Градиенты для темного режима */
-  --gradient-primary: linear-gradient(135deg, #9B59B6 0%, #BB8FCE 100%);
-  --gradient-secondary: linear-gradient(135deg, #F39C12 0%, #FFC107 100%);
-  --gradient-hero: linear-gradient(120deg, #9B59B6 0%, #F39C12 100%);
+  --gradient-primary: linear-gradient(135deg, #A29BFE 0%, #6C5CE7 100%);
+  --gradient-secondary: linear-gradient(135deg, #81ECEC 0%, #00D2D3 100%);
+  --gradient-hero: linear-gradient(120deg, #A29BFE 0%, #81ECEC 100%);
+  
+  /* Эффекты */
+  --glass-bg: rgba(30, 39, 46, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 * {
@@ -84,8 +97,8 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+code, .monospace {
+  font-family: 'Roboto Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
   background-color: rgba(0, 0, 0, 0.05);
   padding: 2px 4px;
   border-radius: 4px;
@@ -93,7 +106,7 @@ code {
   color: var(--primary-color);
 }
 
-[data-theme="dark"] code {
+[data-theme="dark"] code, [data-theme="dark"] .monospace {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -164,6 +177,16 @@ code {
   100% { background-position: 1000px 0; }
 }
 
+@keyframes slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 .fade-in {
   animation: fadeIn var(--transition-normal);
 }
@@ -172,20 +195,102 @@ code {
   animation: pulse 2s infinite;
 }
 
-/* Фото для светлого/темного режима */
-.theme-image {
-  transition: filter 0.3s ease;
+.slide-up {
+  animation: slide-up 0.5s ease forwards;
 }
 
-[data-theme="dark"] .theme-image {
-  filter: brightness(0.8) contrast(1.2);
+.blink {
+  animation: blink 1.5s infinite;
 }
 
-/* Глобальные стили для контейнеров */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+/* Стили для стеклянного эффекта */
+.glass-effect {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+}
+
+/* Стили для графиков и технологичных элементов */
+.tech-card {
+  background-color: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border-left: 4px solid var(--primary-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.tech-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--gradient-primary);
+}
+
+.grid-line {
+  background-image: 
+    linear-gradient(to right, var(--border-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Стили для технологичного текста */
+.tech-text {
+  color: var(--primary-color);
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 500;
+}
+
+.value-up {
+  color: var(--success-color);
+  font-weight: 600;
+}
+
+.value-down {
+  color: var(--danger-color);
+  font-weight: 600;
+}
+
+/* Стили для рыночных данных */
+.market-data {
+  font-family: 'Roboto Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Стили для бейджей и статусов */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--primary-light);
+  color: var(--dark-color);
+}
+
+.status-live {
+  position: relative;
+  padding-left: 16px;
+}
+
+.status-live::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--success-color);
+  animation: blink 1.5s infinite;
 }
 
 /* Стили для индикаторов статуса */

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
   AppBar, 
   Toolbar, 
@@ -48,12 +48,13 @@ import TokenDetails from './pages/TokenDetails';
 import Investors from './pages/Investors';
 import Profile from './pages/Profile';
 import FiltersBar from './components/FiltersBar';
+import HomePage from './pages/HomePage';
 
 // Web3 контекст
 import { Web3Context, Web3Provider } from './contexts/Web3Context';
 
 // Главный компонент приложения с маршрутизацией
-function App() {
+const App: React.FC = () => {
   return (
     <Web3Provider>
       <ToastContainer 
@@ -71,7 +72,7 @@ function App() {
       <AppContent />
     </Web3Provider>
   );
-}
+};
 
 // Содержимое приложения, использующее контекст
 function AppContent() {
@@ -338,7 +339,7 @@ function AppContent() {
           </Box>
         ) : (
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/create-token" element={<CreateToken />} />
             <Route path="/tokens" element={<TokenList />} />
