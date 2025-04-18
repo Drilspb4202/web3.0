@@ -47,6 +47,7 @@ import Dashboard from './pages/Dashboard';
 import TokenDetails from './pages/TokenDetails';
 import Investors from './pages/Investors';
 import Profile from './pages/Profile';
+import FiltersBar from './components/FiltersBar';
 
 // Web3 контекст
 import { Web3Context, Web3Provider } from './contexts/Web3Context';

@@ -29,7 +29,11 @@ import {
   TextField,
   Badge,
   Container,
-  styled
+  styled,
+  CardMedia,
+  CardActions,
+  Tabs,
+  Tab
 } from '@mui/material';
 import { Web3Context } from '../contexts/Web3Context';
 import { getTokensCount, getTokensInfo, TokenInfo } from '../services/tokenFactory';
@@ -39,15 +43,13 @@ import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import { FiltersBar } from '../components/FiltersBar';
 import TokenCard from '../components/TokenCard';
-
-// Иконки
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import TokenIcon from '@mui/icons-material/Token';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import LaunchIcon from '@mui/icons-material/Launch';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LocalAtmIcon from '@mui/icons-material/LocalAtm';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import PendingIcon from '@mui/icons-material/Pending';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 
 // Container animation variants
 const containerVariants = {
@@ -98,6 +100,108 @@ const StyledPagination = styled(Pagination)(({ theme }) => ({
   },
 }));
 
+// Данные для текущих проектов
+const activeProjects = [
+  {
+    id: 1,
+    name: "Кофейня 'CoffeeMania'",
+    description: "Сеть уютных кофеен в бизнес-центрах с уникальными сортами кофе и быстрым обслуживанием",
+    logo: "https://via.placeholder.com/150/8E44AD/FFFFFF?text=CM",
+    raised: 70000,
+    goal: 100000,
+    tokenPrice: 0.05,
+    currency: "AVAX",
+    category: "Общепит"
+  },
+  {
+    id: 2,
+    name: "Прокат велосипедов 'ВелоCity'",
+    description: "Прокат электровелосипедов в центре города с приложением для отслеживания и удобной оплатой",
+    logo: "https://via.placeholder.com/150/3498DB/FFFFFF?text=VC",
+    raised: 45000,
+    goal: 80000,
+    tokenPrice: 0.03,
+    currency: "AVAX",
+    category: "Транспорт"
+  },
+  {
+    id: 3,
+    name: "Фитнес-центр 'PowerZone'",
+    description: "Современный фитнес-центр с новейшим оборудованием и профессиональными тренерами",
+    logo: "https://via.placeholder.com/150/E74C3C/FFFFFF?text=PZ",
+    raised: 125000,
+    goal: 150000,
+    tokenPrice: 0.08,
+    currency: "AVAX",
+    category: "Спорт"
+  },
+  {
+    id: 4,
+    name: "Пекарня 'BreadMaster'",
+    description: "Артизанская пекарня с фокусом на натуральные ингредиенты и традиционные рецепты",
+    logo: "https://via.placeholder.com/150/F39C12/FFFFFF?text=BM",
+    raised: 30000,
+    goal: 60000,
+    tokenPrice: 0.02,
+    currency: "AVAX",
+    category: "Общепит"
+  }
+];
+
+// Данные для будущих проектов
+const upcomingProjects = [
+  {
+    id: 101,
+    name: "Доставка здоровой еды 'GreenMeal'",
+    description: "Сервис доставки персонализированных здоровых обедов для офисных работников",
+    logo: "https://via.placeholder.com/150/27AE60/FFFFFF?text=GM",
+    status: "На рассмотрении", // "На рассмотрении" или "Готовится выпуск"
+    category: "Общепит"
+  },
+  {
+    id: 102,
+    name: "Школа программирования 'CodeAcademy'",
+    description: "Интенсивные курсы программирования с гарантированным трудоустройством",
+    logo: "https://via.placeholder.com/150/9B59B6/FFFFFF?text=CA",
+    status: "Готовится выпуск",
+    category: "Образование"
+  },
+  {
+    id: 103,
+    name: "Экотуризм 'NatureExplorer'",
+    description: "Организация экологических туров в уникальные природные места",
+    logo: "https://via.placeholder.com/150/2ECC71/FFFFFF?text=NE",
+    status: "На рассмотрении",
+    category: "Туризм"
+  }
+];
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel = (props: TabPanelProps) => {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`projects-tabpanel-${index}`}
+      aria-labelledby={`projects-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ pt: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+};
+
 const TokenList: React.FC = () => {
   const { account, isLocalNode, networkName } = useContext(Web3Context);
   const theme = useTheme();
@@ -117,6 +221,8 @@ const TokenList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredTokens, setFilteredTokens] = useState<TokenInfo[]>([]);
   const [sortFilter, setSortFilter] = useState('newest');
+  
+  const [tabValue, setTabValue] = useState(0);
   
   useEffect(() => {
     const getTokens = async () => {
@@ -214,7 +320,17 @@ const TokenList: React.FC = () => {
   const handleSortChange = (value: string) => {
     setSortFilter(value);
   };
-  
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  const getProgressColor = (progress: number) => {
+    if (progress < 30) return 'var(--warning-color)';
+    if (progress < 70) return 'var(--info-color)';
+    return 'var(--success-color)';
+  };
+
   if (!account) {
     return (
       <Box className="fade-in" sx={{ my: 4 }}>
@@ -308,16 +424,38 @@ const TokenList: React.FC = () => {
             WebkitTextFillColor: 'transparent',
           }}
         >
-          Explore Tokens
+          Проекты для инвестирования
         </Typography>
         <Typography 
           variant="body1" 
           color="textSecondary" 
           sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}
         >
-          Discover all tokens created on the Chihuahua Capital platform
+          Изучите проекты на нашей платформе и инвестируйте в будущие бизнес-звезды
         </Typography>
       </PageHeading>
+
+      <Paper elevation={0} sx={{ borderRadius: 'var(--radius-lg)', mb: 4 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs 
+            value={tabValue} 
+            onChange={handleTabChange} 
+            aria-label="project tabs"
+            variant={isMobile ? "fullWidth" : "standard"}
+            sx={{ 
+              '& .MuiTab-root': { 
+                fontWeight: 600,
+                fontSize: '1rem',
+                textTransform: 'none',
+                py: 2
+              }
+            }}
+          >
+            <Tab label="Текущие проекты" id="projects-tab-0" />
+            <Tab label="Будущие проекты" id="projects-tab-1" />
+          </Tabs>
+        </Box>
+      </Paper>
 
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, mb: 4, alignItems: 'center', justifyContent: 'space-between' }}>
         <SearchField
@@ -359,45 +497,267 @@ const TokenList: React.FC = () => {
         </motion.div>
       ) : (
         <>
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <Grid container spacing={3}>
-              <AnimatePresence>
-                {currentTokens.map((token, index) => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={token.tokenAddress}>
-                    <TokenCard 
-                      token={token} 
-                      onViewDetails={() => navigate(`/tokens/${token.tokenAddress}`)}
-                      index={index}
-                    />
+          <TabPanel value={tabValue} index={0}>
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <Grid container spacing={3}>
+                {activeProjects.map((project) => {
+                  const progress = Math.round((project.raised / project.goal) * 100);
+                  
+                  return (
+                    <Grid item xs={12} sm={6} md={4} key={project.id}>
+                      <motion.div variants={itemVariants}>
+                        <Card 
+                          className="card-hover" 
+                          sx={{ 
+                            height: '100%', 
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            borderRadius: 'var(--radius-lg)',
+                            overflow: 'hidden',
+                            boxShadow: 'var(--shadow-md)'
+                          }}
+                        >
+                          <Box sx={{ position: 'relative' }}>
+                            <CardMedia
+                              component="img"
+                              height="140"
+                              image={`https://source.unsplash.com/random/600x200/?${project.category.toLowerCase()},business`}
+                              alt={project.name}
+                            />
+                            <Avatar
+                              src={project.logo}
+                              alt={project.name}
+                              sx={{
+                                width: 70,
+                                height: 70,
+                                position: 'absolute',
+                                bottom: -30,
+                                left: 20,
+                                border: '4px solid white',
+                                boxShadow: 'var(--shadow-md)'
+                              }}
+                            />
+                          </Box>
+                          
+                          <CardContent sx={{ pt: 4, pb: 2, px: 3, flexGrow: 1 }}>
+                            <Box sx={{ mb: 2 }}>
+                              <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
+                                {project.name}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                {project.description}
+                              </Typography>
+                            </Box>
+                            
+                            <Box sx={{ mt: 'auto' }}>
+                              <Box sx={{ mb: 1 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                  <Typography variant="body2" fontWeight="bold">
+                                    Сбор средств:
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {progress}%
+                                  </Typography>
+                                </Box>
+                                <LinearProgress 
+                                  variant="determinate" 
+                                  value={progress} 
+                                  sx={{ 
+                                    height: 8, 
+                                    borderRadius: 4,
+                                    bgcolor: 'rgba(0,0,0,0.05)',
+                                    '& .MuiLinearProgress-bar': {
+                                      backgroundColor: getProgressColor(progress)
+                                    }
+                                  }} 
+                                />
+                              </Box>
+                              
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                  Собрано: <strong>{project.raised.toLocaleString()} ₽</strong>
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  Цель: <strong>{project.goal.toLocaleString()} ₽</strong>
+                                </Typography>
+                              </Box>
+                              
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                                <Chip 
+                                  label={`${project.tokenPrice} ${project.currency}`}
+                                  color="primary"
+                                  size="small"
+                                  icon={<LocalAtmIcon />}
+                                  sx={{ fontWeight: 'bold' }}
+                                />
+                                <Typography variant="caption" color="text.secondary">
+                                  Токенов: {Math.round(project.goal / project.tokenPrice).toLocaleString()}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </CardContent>
+                          
+                          <CardActions sx={{ p: 2, pt: 0, display: 'flex', justifyContent: 'space-between' }}>
+                            <Button 
+                              size="small" 
+                              component={Link} 
+                              to={`/tokens/${project.id}`}
+                              sx={{ textTransform: 'none' }}
+                            >
+                              Подробнее
+                            </Button>
+                            <Button 
+                              variant="contained" 
+                              size="medium"
+                              sx={{ 
+                                background: 'var(--gradient-primary)',
+                                fontWeight: 'bold',
+                                textTransform: 'none',
+                                px: 3,
+                                '&:hover': {
+                                  boxShadow: 'var(--shadow-lg)'
+                                }
+                              }}
+                            >
+                              Инвестировать
+                            </Button>
+                          </CardActions>
+                        </Card>
+                      </motion.div>
+                    </Grid>
+                  )
+                })}
+              </Grid>
+            </motion.div>
+          </TabPanel>
+
+          <TabPanel value={tabValue} index={1}>
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <Grid container spacing={3}>
+                {upcomingProjects.map((project) => (
+                  <Grid item xs={12} sm={6} md={4} key={project.id}>
+                    <motion.div variants={itemVariants}>
+                      <Card 
+                        className="card-hover" 
+                        sx={{ 
+                          height: '100%', 
+                          display: 'flex', 
+                          flexDirection: 'column',
+                          borderRadius: 'var(--radius-lg)',
+                          overflow: 'hidden',
+                          boxShadow: 'var(--shadow-md)',
+                          opacity: 0.85
+                        }}
+                      >
+                        <Box sx={{ position: 'relative' }}>
+                          <CardMedia
+                            component="img"
+                            height="140"
+                            image={`https://source.unsplash.com/random/600x200/?${project.category.toLowerCase()},startup`}
+                            alt={project.name}
+                            sx={{ filter: 'grayscale(30%)' }}
+                          />
+                          <Avatar
+                            src={project.logo}
+                            alt={project.name}
+                            sx={{
+                              width: 70,
+                              height: 70,
+                              position: 'absolute',
+                              bottom: -30,
+                              left: 20,
+                              border: '4px solid white',
+                              boxShadow: 'var(--shadow-md)'
+                            }}
+                          />
+                        </Box>
+                        
+                        <CardContent sx={{ pt: 4, pb: 2, px: 3, flexGrow: 1 }}>
+                          <Box sx={{ mb: 2 }}>
+                            <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
+                              {project.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                              {project.description}
+                            </Typography>
+                          </Box>
+                          
+                          <Box sx={{ mt: 'auto' }}>
+                            <Chip 
+                              icon={project.status === "На рассмотрении" ? <PendingIcon /> : <HourglassEmptyIcon />}
+                              label={project.status}
+                              color={project.status === "На рассмотрении" ? "secondary" : "primary"}
+                              sx={{ 
+                                fontWeight: 'bold',
+                                mt: 2
+                              }}
+                            />
+                          </Box>
+                        </CardContent>
+                        
+                        <CardActions sx={{ p: 2, pt: 0 }}>
+                          <Button 
+                            variant="outlined" 
+                            color="primary" 
+                            size="medium"
+                            startIcon={<InfoOutlinedIcon />}
+                            sx={{ 
+                              textTransform: 'none',
+                              fontWeight: 'bold',
+                              borderRadius: 'var(--radius-md)'
+                            }}
+                            fullWidth
+                          >
+                            Узнать больше
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    </motion.div>
                   </Grid>
                 ))}
-              </AnimatePresence>
-            </Grid>
-          </motion.div>
+              </Grid>
+            </motion.div>
+          </TabPanel>
 
-          {totalPages > 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+          {account && (
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                justifyContent: 'center',
+                mt: 6,
+                mb: 4
+              }}
+            >
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<AddCircleOutlineIcon />}
+                component={Link}
+                to="/create-token"
+                sx={{
+                  background: 'var(--gradient-secondary)',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem',
+                  px: 4,
+                  py: 1.5,
+                  boxShadow: 'var(--shadow-md)',
+                  '&:hover': {
+                    boxShadow: 'var(--shadow-lg)',
+                    transform: 'translateY(-2px)'
+                  }
+                }}
               >
-                <Stack spacing={2}>
-                  <StyledPagination
-                    count={totalPages}
-                    page={page}
-                    onChange={handlePageChange}
-                    color="primary"
-                    size={isMobile ? "small" : "medium"}
-                    showFirstButton
-                    showLastButton
-                  />
-                </Stack>
-              </motion.div>
+                Создать новый проект
+              </Button>
             </Box>
           )}
         </>
