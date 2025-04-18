@@ -35,6 +35,9 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import TelegramIcon from '@mui/icons-material/Telegram';
+import BusinessIcon from '@mui/icons-material/Business';
+import PeopleIcon from '@mui/icons-material/People';
+import PersonIcon from '@mui/icons-material/Person';
 
 // Компоненты
 import Home from './pages/Home';
@@ -42,6 +45,8 @@ import CreateToken from './pages/CreateToken';
 import TokenList from './pages/TokenList';
 import Dashboard from './pages/Dashboard';
 import TokenDetails from './pages/TokenDetails';
+import Investors from './pages/Investors';
+import Profile from './pages/Profile';
 
 // Web3 контекст
 import { Web3Context, Web3Provider } from './contexts/Web3Context';
@@ -87,9 +92,9 @@ function AppContent() {
 
   const navLinks = [
     { title: 'Главная', path: '/', icon: <HomeIcon /> },
-    { title: 'Дашборд', path: '/dashboard', icon: <HomeIcon /> },
-    { title: 'Создать токен', path: '/create-token', icon: <AddCircleIcon /> },
-    { title: 'Токены', path: '/tokens', icon: <TokenIcon /> },
+    { title: 'Проекты', path: '/tokens', icon: <BusinessIcon /> },
+    { title: 'Инвесторы', path: '/investors', icon: <PeopleIcon /> },
+    { title: 'Мой профиль', path: '/profile', icon: <PersonIcon /> },
   ];
 
   const drawerContent = (
@@ -147,7 +152,7 @@ function AppContent() {
             }}
             startIcon={<AccountBalanceWalletIcon />}
           >
-            {isLocalNode ? 'Использовать локальную ноду' : 'Подключить кошелек'}
+            Подключить кошелёк (MetaMask/Fuji)
           </Button>
         ) : (
           <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(142, 68, 173, 0.1)' }}>
@@ -271,12 +276,12 @@ function AppContent() {
                     '&:hover': {
                       bgcolor: 'rgba(255, 255, 255, 0.9)'
                     },
-                    minWidth: 180
+                    minWidth: 230
                   }}
                   onClick={connectWallet}
                   startIcon={<AccountBalanceWalletIcon />}
                 >
-                  {isLocalNode ? 'Использовать локальную ноду' : 'Подключить кошелек'}
+                  Подключить кошелёк (MetaMask/Fuji)
                 </Button>
               ) : (
                 <Button 
@@ -337,6 +342,8 @@ function AppContent() {
             <Route path="/create-token" element={<CreateToken />} />
             <Route path="/tokens" element={<TokenList />} />
             <Route path="/tokens/:id" element={<TokenDetails />} />
+            <Route path="/investors" element={<Investors />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         )}
       </Container>
