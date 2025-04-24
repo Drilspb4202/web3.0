@@ -895,7 +895,7 @@ const TokenList: React.FC = () => {
                 // Обновить интерфейс после удаления из избранного
                 setTabValue(tabValue);
               }}
-            />
+                  />
           </TabPanel>
 
           {account && (

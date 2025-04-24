@@ -17,6 +17,7 @@ export interface TokenInfo {
   timestamp: number;
   totalSupply: number;
   verified?: boolean;
+  imageUrl?: string; // URL to the token image
 }
 
 export const getProvider = (): ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider | null => {
@@ -130,7 +131,8 @@ export const getTokensInfo = async (): Promise<TokenInfo[]> => {
       creator: "0xabcdef1234567890abcdef1234567890abcdef12",
       timestamp: Date.now() - 86400000 * 30, // 30 дней назад
       totalSupply: 100000,
-      verified: true
+      verified: true,
+      imageUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
     },
     {
       tokenAddress: "0x2345678901234567890123456789012345678901",
@@ -139,7 +141,8 @@ export const getTokensInfo = async (): Promise<TokenInfo[]> => {
       creator: "0xfedcba0987654321fedcba0987654321fedcba09",
       timestamp: Date.now() - 86400000 * 15, // 15 дней назад
       totalSupply: 50000,
-      verified: true
+      verified: true,
+      imageUrl: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
     },
     {
       tokenAddress: "0x3456789012345678901234567890123456789012",
@@ -148,7 +151,8 @@ export const getTokensInfo = async (): Promise<TokenInfo[]> => {
       creator: "0xabcdef1234567890abcdef1234567890abcdefab",
       timestamp: Date.now() - 86400000 * 7, // 7 дней назад
       totalSupply: 75000,
-      verified: false
+      verified: false,
+      imageUrl: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
     }
   ];
   

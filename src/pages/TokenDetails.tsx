@@ -27,11 +27,20 @@ import TokenIcon from '@mui/icons-material/Token';
 import InfoIcon from '@mui/icons-material/Info';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import AddIcon from '@mui/icons-material/Add';
 import { shortenAddress, formatDate, formatAmount } from '../utils';
 import { Web3Context } from '../contexts/Web3Context';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import DashboardCard from '../components/DashboardCard';
+import { 
+  addUserToken, 
+  isTokenFavorite, 
+  toggleFavoriteToken,
+  getUserTokens
+} from '../services/userTokens';
 
 interface TokenData {
   id: string;
@@ -42,6 +51,7 @@ interface TokenData {
   createdAt: string;
   description: string;
   address: string;
+  imageUrl?: string;
 }
 
 const TokenDetails: React.FC = () => {
@@ -53,6 +63,8 @@ const TokenDetails: React.FC = () => {
   const [token, setToken] = useState<TokenData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isInUserPortfolio, setIsInUserPortfolio] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   
   // Fetch token details
   useEffect(() => {
@@ -64,7 +76,7 @@ const TokenDetails: React.FC = () => {
         // This is just mock data for display
         // In a real app, you would fetch this from your contract or API
         setTimeout(() => {
-          setToken({
+          const mockToken = {
             id: id || '1',
             name: 'Urban Coffee Shop',
             symbol: 'UCOF',
@@ -72,8 +84,21 @@ const TokenDetails: React.FC = () => {
             owner: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
             createdAt: new Date().toISOString(),
             description: 'Urban Coffee Shop is a premium coffee chain with 5 locations in downtown. This token represents ownership shares in the business.',
-            address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'
-          });
+            address: id || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+            imageUrl: 'https://example.com/urban-coffee-shop.jpg'
+          };
+          
+          setToken(mockToken);
+          
+          // Check if token is in user's portfolio
+          if (account) {
+            const userBinding = getUserTokens(account);
+            if (userBinding) {
+              setIsInUserPortfolio(userBinding.tokenAddresses.includes(mockToken.address));
+              setIsFavorite(userBinding.favoriteTokens.includes(mockToken.address));
+            }
+          }
+          
           setLoading(false);
         }, 1000);
       } catch (err) {
@@ -84,11 +109,32 @@ const TokenDetails: React.FC = () => {
     };
     
     fetchTokenDetails();
-  }, [id]);
+  }, [id, account]);
   
   const copyToClipboard = (text: string, message: string) => {
     navigator.clipboard.writeText(text);
     toast.success(message, { autoClose: 2000 });
+  };
+  
+  const handleAddToPortfolio = () => {
+    if (!account || !token) return;
+    
+    addUserToken(account, token.address);
+    setIsInUserPortfolio(true);
+    toast.success(`${token.name} (${token.symbol}) added to your portfolio`, { autoClose: 3000 });
+  };
+  
+  const handleToggleFavorite = () => {
+    if (!account || !token) return;
+    
+    const newStatus = toggleFavoriteToken(account, token.address);
+    setIsFavorite(newStatus);
+    
+    if (newStatus) {
+      toast.success(`${token.name} added to favorites`, { autoClose: 2000 });
+    } else {
+      toast.info(`${token.name} removed from favorites`, { autoClose: 2000 });
+    }
   };
   
   if (loading) {
@@ -173,8 +219,9 @@ const TokenDetails: React.FC = () => {
                     fontWeight: 'bold',
                     fontSize: '1.5rem'
                   }}
+                  src={token.imageUrl}
                 >
-                  {token.symbol.substring(0, 2)}
+                  {!token.imageUrl && token.symbol.substring(0, 2)}
                 </Avatar>
                 <Box>
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
@@ -248,9 +295,125 @@ const TokenDetails: React.FC = () => {
                   </Box>
                 </Grid>
               </Grid>
+              
+              {/* Add Portfolio and Favorite buttons */}
+              {account && (
+                <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                  {!isInUserPortfolio ? (
+                    <Button 
+                      variant="outlined" 
+                      color="primary"
+                      startIcon={<AddIcon />}
+                      onClick={handleAddToPortfolio}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      Add to Portfolio
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="outlined" 
+                      color="success"
+                      disabled
+                      sx={{ borderRadius: 2 }}
+                    >
+                      In Your Portfolio
+                    </Button>
+                  )}
+                  
+                  <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"}>
+                    <IconButton 
+                      color={isFavorite ? "warning" : "default"}
+                      onClick={handleToggleFavorite}
+                      sx={{ 
+                        border: `1px solid ${isFavorite ? theme.palette.warning.main : theme.palette.divider}`,
+                        borderRadius: 2,
+                        color: isFavorite ? theme.palette.warning.main : undefined
+                      }}
+                    >
+                      {isFavorite ? <StarIcon /> : <StarBorderIcon />}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
             </Grid>
             
             <Grid item xs={12} md={5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <Box sx={{ 
+                position: 'relative',
+                mb: 4,
+                mx: 'auto',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  width: '80%',
+                  height: '80%',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(255,178,0,0.4) 0%, rgba(255,178,0,0) 70%)',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 0,
+                  animation: 'glow 4s infinite',
+                  '@keyframes glow': {
+                    '0%': { opacity: 0.5 },
+                    '50%': { opacity: 1 },
+                    '100%': { opacity: 0.5 },
+                  }
+                }
+              }}>
+                <Box
+                  component="img"
+                  src="/images/chihuahua-coin.jpeg"
+                  alt="Chihuahua Coin Logo"
+                  sx={{
+                    width: '100%',
+                    maxWidth: 280,
+                    height: 'auto',
+                    mx: 'auto',
+                    display: 'block',
+                    position: 'relative',
+                    zIndex: 1,
+                    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
+                    transition: 'all 0.3s ease',
+                    borderRadius: '8px',
+                    transform: 'scale(1.05)',
+                    animation: 'pulse 3s infinite',
+                    '@keyframes pulse': {
+                      '0%': {
+                        transform: 'scale(1)',
+                      },
+                      '50%': {
+                        transform: 'scale(1.08)',
+                      },
+                      '100%': {
+                        transform: 'scale(1)',
+                      },
+                    },
+                    '&:hover': {
+                      transform: 'scale(1.1)',
+                      filter: 'drop-shadow(0 6px 12px rgba(255,178,0,0.5))',
+                    }
+                  }}
+                />
+              </Box>
+              
+              <Typography 
+                variant="h4" 
+                align="center" 
+                sx={{ 
+                  fontWeight: 800, 
+                  mb: 3,
+                  background: 'linear-gradient(to right, #FF9900, #FFCC00)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.3))',
+                  letterSpacing: '1px',
+                  fontFamily: '"Montserrat", "Roboto", "Helvetica", "Arial", sans-serif'
+                }}
+              >
+                CHIHUAHUA COIN
+              </Typography>
+              
               <Box 
                 component={motion.div}
                 whileHover={{ scale: 1.03 }}

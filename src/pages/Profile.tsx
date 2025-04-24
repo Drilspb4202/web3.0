@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { 
   Container, 
   Box, 
@@ -17,7 +17,9 @@ import {
   Chip,
   TextField,
   Card,
-  CardContent
+  CardContent,
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import { Web3Context } from '../contexts/Web3Context';
 import { motion } from 'framer-motion';
@@ -27,6 +29,14 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SecurityIcon from '@mui/icons-material/Security';
 import HistoryIcon from '@mui/icons-material/History';
+import StarIcon from '@mui/icons-material/Star';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { Link } from 'react-router-dom';
+import UserTokensList from '../components/UserTokensList';
+import { 
+  getUserTokens,
+  getUserFavoriteTokens
+} from '../services/userTokens';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -55,11 +65,34 @@ const TabPanel = (props: TabPanelProps) => {
 };
 
 const Profile: React.FC = () => {
-  const { account, connectWallet } = useContext(Web3Context);
+  const { account, connectWallet, balance } = useContext(Web3Context);
   const [tabValue, setTabValue] = useState(0);
+  const [displayName, setDisplayName] = useState('Инвестор Chihuahua');
+  const [userEmail, setUserEmail] = useState('investor@example.com');
+  const [userBio, setUserBio] = useState(
+    'Активный инвестор на платформе Chihuahua Capital, интересуюсь проектами в сфере DeFi и Web3.'
+  );
+  const [tokenCount, setTokenCount] = useState(0);
+  const [favoriteCount, setFavoriteCount] = useState(0);
+
+  useEffect(() => {
+    if (account) {
+      const userBinding = getUserTokens(account);
+      if (userBinding) {
+        setTokenCount(userBinding.tokenAddresses.length);
+        setFavoriteCount(userBinding.favoriteTokens.length);
+      }
+    }
+  }, [account]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+  };
+
+  const handleSaveProfile = () => {
+    // In a real app, this would save the profile data to a backend or smart contract
+    console.log('Saving profile:', { displayName, userEmail, userBio });
+    // Show success toast or notification
   };
 
   if (!account) {
@@ -158,22 +191,32 @@ const Profile: React.FC = () => {
             
             <Grid item xs={12} md={6}>
               <Typography variant="h4" sx={{ fontWeight: 'bold', textAlign: { xs: 'center', md: 'left' } }}>
-                Инвестор Chihuahua
+                {displayName}
               </Typography>
               <Typography variant="body1" sx={{ opacity: 0.9, mb: 1, textAlign: { xs: 'center', md: 'left' } }}>
                 {account}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: { xs: 'center', md: 'flex-start' } }}>
                 <Chip 
-                  label="Активный инвестор" 
+                  label={`${tokenCount} ${tokenCount === 1 ? 'токен' : 'токенов'}`}
                   size="small" 
                   sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 'bold' }} 
+                  icon={<TokenIcon style={{ color: 'white' }} />}
                 />
                 <Chip 
-                  label="3 проекта" 
+                  label={`${favoriteCount} в избранном`}
                   size="small" 
                   sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 'bold' }} 
+                  icon={<StarIcon style={{ color: 'white' }} />}
                 />
+                {balance && (
+                  <Chip 
+                    label={`${balance} AVAX`}
+                    size="small" 
+                    sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 'bold' }} 
+                    icon={<MonetizationOnIcon style={{ color: 'white' }} />}
+                  />
+                )}
               </Box>
             </Grid>
             
@@ -189,8 +232,20 @@ const Profile: React.FC = () => {
                 color="inherit"
                 sx={{ color: 'var(--primary-color)', fontWeight: 'bold' }}
                 startIcon={<SettingsIcon />}
+                onClick={() => setTabValue(3)} // Switch to settings tab
               >
                 Настройки
+              </Button>
+              
+              <Button 
+                variant="contained" 
+                color="inherit"
+                component={Link}
+                to="/create-token"
+                sx={{ color: 'var(--primary-color)', fontWeight: 'bold' }}
+                startIcon={<AddCircleIcon />}
+              >
+                Создать токен
               </Button>
             </Grid>
           </Grid>
@@ -218,10 +273,17 @@ const Profile: React.FC = () => {
                   <ListItemIcon>
                     <TokenIcon color="primary" />
                   </ListItemIcon>
-                  <ListItemText primary="Мои инвестиции" />
+                  <ListItemText primary="Мои токены" />
                 </ListItem>
                 
                 <ListItem button selected={tabValue === 2} onClick={() => setTabValue(2)}>
+                  <ListItemIcon>
+                    <StarIcon color="primary" />
+                  </ListItemIcon>
+                  <ListItemText primary="Избранное" />
+                </ListItem>
+                
+                <ListItem button selected={tabValue === 5} onClick={() => setTabValue(5)}>
                   <ListItemIcon>
                     <HistoryIcon color="primary" />
                   </ListItemIcon>
@@ -258,11 +320,12 @@ const Profile: React.FC = () => {
             >
               <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="profile tabs">
-                  <Tab label="Баланс и активы" id="profile-tab-0" />
-                  <Tab label="Мои инвестиции" id="profile-tab-1" />
-                  <Tab label="История" id="profile-tab-2" />
+                  <Tab label="Баланс" id="profile-tab-0" />
+                  <Tab label="Мои токены" id="profile-tab-1" />
+                  <Tab label="Избранное" id="profile-tab-2" />
                   <Tab label="Настройки" id="profile-tab-3" />
                   <Tab label="Безопасность" id="profile-tab-4" />
+                  <Tab label="История" id="profile-tab-5" />
                 </Tabs>
               </Box>
               
@@ -290,10 +353,10 @@ const Profile: React.FC = () => {
                           </Typography>
                         </Box>
                         <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'var(--primary-color)', mb: 1 }}>
-                          125.45 AVAX
+                          {balance || '0'} AVAX
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          ≈ $1,245.50 USD
+                          ≈ ${balance ? (parseFloat(balance) * 10).toFixed(2) : '0'} USD
                         </Typography>
                         
                         <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
@@ -371,27 +434,31 @@ const Profile: React.FC = () => {
               </TabPanel>
               
               <TabPanel value={tabValue} index={1}>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--primary-color)', mb: 3 }}>
-                  Мои инвестиции
-                </Typography>
-                
-                <Box>
-                  <Typography variant="body1">
-                    Здесь будет отображаться информация о ваших инвестициях в проекты.
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>
+                    Мои токены
                   </Typography>
+                  
+                  <Button 
+                    variant="contained"
+                    component={Link}
+                    to="/create-token"
+                    startIcon={<AddCircleIcon />}
+                    sx={{ background: 'var(--gradient-primary)' }}
+                  >
+                    Создать токен
+                  </Button>
                 </Box>
+                
+                <UserTokensList />
               </TabPanel>
               
               <TabPanel value={tabValue} index={2}>
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--primary-color)', mb: 3 }}>
-                  История транзакций
+                  Избранные токены
                 </Typography>
                 
-                <Box>
-                  <Typography variant="body1">
-                    Здесь будет отображаться история ваших транзакций.
-                  </Typography>
-                </Box>
+                <UserTokensList showFavoritesOnly={true} />
               </TabPanel>
               
               <TabPanel value={tabValue} index={3}>
@@ -405,7 +472,8 @@ const Profile: React.FC = () => {
                       fullWidth
                       label="Отображаемое имя"
                       variant="outlined"
-                      defaultValue="Инвестор Chihuahua"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
                       margin="normal"
                     />
                   </Grid>
@@ -414,7 +482,8 @@ const Profile: React.FC = () => {
                       fullWidth
                       label="Email"
                       variant="outlined"
-                      defaultValue="investor@example.com"
+                      value={userEmail}
+                      onChange={(e) => setUserEmail(e.target.value)}
                       margin="normal"
                     />
                   </Grid>
@@ -425,14 +494,19 @@ const Profile: React.FC = () => {
                       variant="outlined"
                       multiline
                       rows={4}
-                      defaultValue="Активный инвестор на платформе Chihuahua Capital, интересуюсь проектами в сфере DeFi и Web3."
+                      value={userBio}
+                      onChange={(e) => setUserBio(e.target.value)}
                       margin="normal"
                     />
                   </Grid>
                   
                   <Grid item xs={12}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                      <Button variant="contained" sx={{ background: 'var(--gradient-primary)' }}>
+                      <Button 
+                        variant="contained" 
+                        sx={{ background: 'var(--gradient-primary)' }}
+                        onClick={handleSaveProfile}
+                      >
                         Сохранить изменения
                       </Button>
                     </Box>
@@ -448,6 +522,18 @@ const Profile: React.FC = () => {
                 <Box>
                   <Typography variant="body1">
                     Здесь будут настройки безопасности вашего аккаунта.
+                  </Typography>
+                </Box>
+              </TabPanel>
+              
+              <TabPanel value={tabValue} index={5}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--primary-color)', mb: 3 }}>
+                  История транзакций
+                </Typography>
+                
+                <Box>
+                  <Typography variant="body1">
+                    Здесь будет отображаться история ваших транзакций.
                   </Typography>
                 </Box>
               </TabPanel>

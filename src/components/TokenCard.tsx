@@ -9,7 +9,8 @@ import {
   Tooltip,
   Avatar,
   alpha,
-  useTheme
+  useTheme,
+  ButtonGroup
 } from '@mui/material';
 import LaunchIcon from '@mui/icons-material/Launch';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -20,6 +21,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { shortenAddress } from '../utils';
 import { toast } from 'react-toastify';
 import { TokenInfo } from '../services/tokenFactory';
+import AddToPortfolioButton from './AddToPortfolioButton';
+import TokenFavoriteButton from './TokenFavoriteButton';
 
 interface TokenCardProps {
   token: TokenInfo;
@@ -83,8 +86,9 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, onViewDetails, index }) =>
                 fontWeight: 'bold',
                 mr: 2
               }}
+              src={token.imageUrl}
             >
-              {token.symbol.substring(0, 2)}
+              {!token.imageUrl && token.symbol.substring(0, 2)}
             </Avatar>
             
             <Box sx={{ flex: 1 }}>
@@ -154,22 +158,44 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, onViewDetails, index }) =>
             </Box>
           </Box>
           
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <Tooltip title="View details">
-              <IconButton 
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+            {/* Wrap in div to prevent event bubbling */}
+            <div onClick={(e) => e.stopPropagation()}>
+              <AddToPortfolioButton 
+                tokenAddress={token.tokenAddress}
+                tokenName={token.name}
+                tokenSymbol={token.symbol}
+                variant="icon"
                 size="small"
-                color="primary"
-                onClick={onViewDetails}
-                sx={{ 
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  '&:hover': {
-                    bgcolor: alpha(theme.palette.primary.main, 0.2),
-                  }
-                }}
-              >
-                <LaunchIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+              />
+            </div>
+            
+            <ButtonGroup size="small">
+              {/* Wrap in div to prevent event bubbling */}
+              <div onClick={(e) => e.stopPropagation()}>
+                <TokenFavoriteButton 
+                  tokenAddress={token.tokenAddress}
+                  tokenName={token.name}
+                  size="small"
+                />
+              </div>
+              
+              <Tooltip title="View details">
+                <IconButton 
+                  size="small"
+                  color="primary"
+                  onClick={onViewDetails}
+                  sx={{ 
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    '&:hover': {
+                      bgcolor: alpha(theme.palette.primary.main, 0.2),
+                    }
+                  }}
+                >
+                  <LaunchIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </ButtonGroup>
           </Box>
         </CardContent>
       </Card>

@@ -124,9 +124,9 @@ const FiltersBar: React.FC<FiltersBarProps> = ({ onSortChange, sortValue }) => {
             
             <FormControl size="small" sx={{ minWidth: 180 }}>
               <InputLabel id="sort-select-label">Сортировка</InputLabel>
-              <Select
-                labelId="sort-select-label"
-                id="sort-select"
+          <Select
+            labelId="sort-select-label"
+            id="sort-select"
                 value={sortValue || sortType}
                 label="Сортировка"
                 sx={{ 
@@ -134,14 +134,14 @@ const FiltersBar: React.FC<FiltersBarProps> = ({ onSortChange, sortValue }) => {
                   fontSize: '0.9rem'
                 }}
                 onChange={(e: SelectChangeEvent) => handleSortSelect(e.target.value)}
-              >
+          >
                 <MenuItem value="newest">Сначала новые</MenuItem>
                 <MenuItem value="oldest">Сначала старые</MenuItem>
                 <MenuItem value="name">По названию</MenuItem>
                 <MenuItem value="progress">По прогрессу сбора</MenuItem>
                 <MenuItem value="price-asc">По цене (возр.)</MenuItem>
                 <MenuItem value="price-desc">По цене (убыв.)</MenuItem>
-              </Select>
+          </Select>
             </FormControl>
           </Box>
           
@@ -178,23 +178,23 @@ const FiltersBar: React.FC<FiltersBarProps> = ({ onSortChange, sortValue }) => {
                 />
               ))}
             </Box>
-          </Box>
-          
-          <IconButton 
+      </Box>
+
+          <IconButton
             onClick={resetFilters} 
             color="primary" 
             size="small"
-            sx={{ 
+            sx={{
               display: 'flex',
               ml: { xs: 'auto', md: 0 }
             }}
           >
             <RestartAltIcon />
           </IconButton>
-        </Box>
+    </Box>
       </Paper>
     </motion.div>
   );
-};
+}; 
 
 export default FiltersBar; 

@@ -38,6 +38,7 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import BusinessIcon from '@mui/icons-material/Business';
 import PeopleIcon from '@mui/icons-material/People';
 import PersonIcon from '@mui/icons-material/Person';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 
 // Компоненты
 import Home from './pages/Home';
@@ -49,6 +50,7 @@ import Investors from './pages/Investors';
 import Profile from './pages/Profile';
 import FiltersBar from './components/FiltersBar';
 import HomePage from './pages/HomePage';
+import Exchange from './pages/Exchange';
 
 // Web3 контекст
 import { Web3Context, Web3Provider } from './contexts/Web3Context';
@@ -94,6 +96,7 @@ function AppContent() {
 
   const navLinks = [
     { title: 'Главная', path: '/', icon: <HomeIcon /> },
+    { title: 'Биржа', path: '/exchange', icon: <CurrencyExchangeIcon /> },
     { title: 'Проекты', path: '/tokens', icon: <BusinessIcon /> },
     { title: 'Инвесторы', path: '/investors', icon: <PeopleIcon /> },
     { title: 'Мой профиль', path: '/profile', icon: <PersonIcon /> },
@@ -340,12 +343,14 @@ function AppContent() {
         ) : (
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/create-token" element={<CreateToken />} />
             <Route path="/tokens" element={<TokenList />} />
-            <Route path="/tokens/:id" element={<TokenDetails />} />
+            <Route path="/tokens/:tokenId" element={<TokenDetails />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/investors" element={<Investors />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/exchange" element={<Exchange />} />
           </Routes>
         )}
       </Container>
