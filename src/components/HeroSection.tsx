@@ -6,7 +6,9 @@ import {
   Button, 
   Grid, 
   useTheme, 
-  useMediaQuery 
+  useMediaQuery,
+  Card,
+  CardMedia
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +41,20 @@ const HeroSection: React.FC = () => {
         type: 'spring',
         stiffness: 100,
         damping: 10
+      }
+    }
+  };
+
+  const imageVariants = {
+    hidden: { scale: 0.8, opacity: 0 },
+    visible: {
+      scale: 1,
+      opacity: 1,
+      transition: { 
+        type: 'spring',
+        stiffness: 80,
+        damping: 15,
+        delay: 0.4
       }
     }
   };
@@ -247,14 +263,14 @@ const HeroSection: React.FC = () => {
                         variant="h4" 
                         component="div" 
                         sx={{ 
-                          fontWeight: 'bold', 
-                          fontSize: { xs: '1.5rem', sm: '2rem' } 
+                          fontWeight: 'bold',
+                          fontSize: { xs: '1.75rem', sm: '2rem' }
                         }}
                       >
                         {item.value}
                       </Typography>
                       <Typography 
-                        variant="body1" 
+                        variant="body2" 
                         sx={{ 
                           opacity: 0.7,
                           fontSize: { xs: '0.875rem', sm: '1rem' }
@@ -269,38 +285,43 @@ const HeroSection: React.FC = () => {
             </Box>
           </Grid>
           
-          <Grid item xs={12} md={5} sx={{ display: { xs: 'none', md: 'block' } }}>
+          <Grid item xs={12} md={5}>
             <Box
               component={motion.div}
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              variants={imageVariants}
+              initial="hidden"
+              animate="visible"
               sx={{
                 position: 'relative',
-                height: '100%',
-                minHeight: 400,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+                display: { xs: 'none', md: 'block' }
               }}
             >
-              <Box
-                component="img"
-                src="/images/platform-mockup.png"
-                alt="Chihuahua Capital Platform"
+              <Card
+                elevation={10}
                 sx={{
-                  maxWidth: '100%',
-                  height: 'auto',
                   borderRadius: 4,
-                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
-                  transform: 'perspective(1500px) rotateY(-15deg)',
-                  transition: 'transform 0.5s ease',
+                  overflow: 'hidden',
+                  transform: 'rotate(5deg)',
+                  boxShadow: '0 15px 35px rgba(0, 0, 0, 0.3)',
+                  transition: 'transform 0.3s ease-in-out',
                   '&:hover': {
-                    transform: 'perspective(1500px) rotateY(-5deg)',
-                  },
+                    transform: 'rotate(2deg) scale(1.02)',
+                  }
                 }}
-              />
+              >
+                <CardMedia
+                  component="img"
+                  image="/images/chihuahua-coin.jpeg"
+                  alt="Chihuahua Coin"
+                  sx={{
+                    height: 400,
+                    width: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
+              </Card>
               
+              {/* Floating elements */}
               <Box
                 component={motion.div}
                 animate={{
@@ -313,17 +334,23 @@ const HeroSection: React.FC = () => {
                 }}
                 sx={{
                   position: 'absolute',
-                  bottom: '10%',
-                  right: '5%',
-                  borderRadius: 2,
-                  bgcolor: 'white',
-                  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
-                  p: 2,
-                  maxWidth: 180,
+                  bottom: -20,
+                  right: -20,
+                  width: 100,
+                  height: 100,
+                  borderRadius: '50%',
+                  backgroundColor: theme.palette.secondary.main,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)',
+                  zIndex: 5,
                 }}
               >
-                <Typography variant="subtitle2" color="primary.main" fontWeight="bold">
-                  Уже более 10,000 инвесторов
+                <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                  ЧихуКоин
                 </Typography>
               </Box>
             </Box>
