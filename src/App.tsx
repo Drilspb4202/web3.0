@@ -41,7 +41,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 
 // Компоненты
-import Home from './pages/Home';
 import CreateToken from './pages/CreateToken';
 import TokenList from './pages/TokenList';
 import Dashboard from './pages/Dashboard';
@@ -343,7 +342,6 @@ function AppContent() {
         ) : (
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/home" element={<Home />} />
             <Route path="/create-token" element={<CreateToken />} />
             <Route path="/tokens" element={<TokenList />} />
             <Route path="/tokens/:tokenId" element={<TokenDetails />} />
