@@ -2,8 +2,8 @@
   "version": 2,
   "buildCommand": "./vercel-build.sh",
   "outputDirectory": "build",
+  "framework": "create-react-app",
   "routes": [
-    { "handle": "filesystem" },
     {
       "src": "/static/(.*)",
       "dest": "/static/$1",
@@ -18,9 +18,16 @@
       "dest": "/assets/$1"
     },
     {
+      "src": "/images/(.*)",
+      "dest": "/images/$1"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/index.html",
-      "headers": { "cache-control": "public, max-age=0, must-revalidate" }
+      "dest": "/index.html"
     }
   ],
   "github": {

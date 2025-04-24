@@ -30,6 +30,16 @@ if [ -d "build" ] && [ "$(ls -A build)" ]; then
   echo "Build directory exists and contains files."
   echo "Contents of build directory:"
   ls -la build
+  
+  # Копируем redirects файл если он еще не скопирован
+  if [ -f "public/_redirects" ] && [ ! -f "build/_redirects" ]; then
+    echo "Copying _redirects file to build directory..."
+    cp public/_redirects build/
+  fi
+  
+  # Создаем пустой файл .nojekyll для правильной обработки Vercel
+  echo "Creating .nojekyll file..."
+  touch build/.nojekyll
 else
   echo "ERROR: Build directory is empty or does not exist!"
   exit 1
