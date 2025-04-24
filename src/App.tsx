@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, Component, ErrorInfo, ReactNode } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
   AppBar, 
@@ -55,24 +55,63 @@ import Exchange from './pages/Exchange';
 // Web3 контекст
 import { Web3Context, Web3Provider } from './contexts/Web3Context';
 
+// Компонент ErrorBoundary для отлова ошибок рендеринга
+class ErrorBoundary extends Component<{ children: ReactNode }> {
+  state = { hasError: false, error: null };
+  
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Ошибка в UI:", error, errorInfo);
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Container sx={{ py: 5, textAlign: 'center' }}>
+          <Typography variant="h4" color="error" gutterBottom>
+            Что-то пошло не так
+          </Typography>
+          <Typography variant="body1" paragraph>
+            Произошла ошибка при загрузке приложения. Попробуйте обновить страницу.
+          </Typography>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={() => window.location.reload()}
+          >
+            Обновить страницу
+          </Button>
+        </Container>
+      );
+    }
+    
+    return this.props.children;
+  }
+}
+
 // Главный компонент приложения с маршрутизацией
 const App: React.FC = () => {
   return (
-    <Web3Provider>
-      <ToastContainer 
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      <AppContent />
-    </Web3Provider>
+    <ErrorBoundary>
+      <Web3Provider>
+        <ToastContainer 
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+        <AppContent />
+      </Web3Provider>
+    </ErrorBoundary>
   );
 };
 
