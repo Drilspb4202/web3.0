@@ -24,7 +24,14 @@
   ],
   "rules": {
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/ban-types": ["error", {
+      "types": {
+        "{}": false
+      },
+      "extendDefaults": true
+    }]
   },
   "settings": {
     "react": {

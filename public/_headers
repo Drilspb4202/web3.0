@@ -1,5 +1,0 @@
-/*
-  Cache-Control: no-cache
-  X-Frame-Options: DENY
-  X-XSS-Protection: 1; mode=block
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; 

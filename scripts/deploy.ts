@@ -6,9 +6,9 @@ async function main() {
   const TokenFactory = await ethers.getContractFactory("TokenFactory");
   const tokenFactory = await TokenFactory.deploy();
 
-  await tokenFactory.deploymentTransaction()?.wait();
+  await tokenFactory.deployed();
 
-  console.log("TokenFactory deployed to:", await tokenFactory.getAddress());
+  console.log("TokenFactory deployed to:", tokenFactory.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
